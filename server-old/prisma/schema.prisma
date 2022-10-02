@@ -1,3 +1,6 @@
+// This is your Prisma schema file,3
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,8 +14,7 @@ model Game {
   id        String @id @default(uuid())
   title     String
   bannerUrl String
-
-  ads Ad[]
+  ads       Ad[]
 }
 
 model Ad {
@@ -22,10 +24,10 @@ model Ad {
   yearsPlaying    Int
   discord         String
   weekDays        String
-  hourStart       Int
-  hourEnd         Int
+  hoursStart       Int
+  hoursEnd         Int
   useVoiceChannel Boolean
-  createdAt       DateTime @default(now())
+  creadetAt       DateTime @default(now())
 
   game Game @relation(fields: [gameId], references: [id])
 }

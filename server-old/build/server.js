@@ -13,13 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const convert_hour_string_to_minutes_1 = require("./utils/convert-hour-string-to-minutes");
+const cors_1 = __importDefault(require("cors"));
 const client_1 = require("@prisma/client");
+const convert_hour_string_to_minutes_1 = require("./utils/convert-hour-string-to-minutes");
+const convert_minutes_string_to_hours_1 = require("./utils/convert-minutes-string-to-hours");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const prisma = new client_1.PrismaClient({
     log: ['query']
 });
+app.use((0, cors_1.default)());
 // http methods / API RESTfull / HTTP Codes (2-> sucesso, 3-> redirecionamento, 4-> erros da api, 5->erros inesperados )
 //GET, POST, PUT, PATCH, DELETE
 /**
@@ -45,17 +48,17 @@ app.post('/games/:id/ads', (request, response) => __awaiter(void 0, void 0, void
     const body = request.body;
     const ad = yield prisma.ad.create({
         data: {
-            gameId,
+            gameId: gameId,
             name: body.name,
             yearsPlaying: body.yearsPlaying,
             discord: body.discord,
             weekDays: body.weekDays.join(','),
-            hoursStart: (0, convert_hour_string_to_minutes_1.convertHourStringToMinutes)(body.hoursStart),
+            hoursStart: (0, convert_s_string_to_minutes_1.convertHourStringToMinutes)(body.hoursStart),
             hoursEnd: (0, convert_hour_string_to_minutes_1.convertHourStringToMinutes)(body.hoursEnd),
             useVoiceChannel: body.useVoiceChannel,
         }
     });
-    return response.status(201).json(ad);
+    return response.status(201).json([body]);
 }));
 app.get('/games/:id/ads', function acesso(request, response) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -78,7 +81,7 @@ app.get('/games/:id/ads', function acesso(request, response) {
             },
         });
         return response.json([ads.map(ad => {
-                return Object.assign(Object.assign({}, ad), { weekDays: ad.weekDays.split(',') });
+                return Object.assign(Object.assign({}, ad), { weekDays: ad.weekDays.split(','), hourStart: (0, convert_minutes_string_to_hours_1.convertMinutesToHourString)(ad.hourStart), hourEnd: (0, convert_minutes_string_to_hours_1.convertMinutesToHourString)(ad.hourEnd) });
             })]);
     });
 });
